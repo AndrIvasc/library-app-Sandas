@@ -17,19 +17,6 @@ class Library:
         self._copies.append(copy)
         return copy
 
-    # def borrow_copy(self, book: Book) -> BookCopy:
-    #     """
-    #     Finds the first available copy matching the given book and marks it as 'borrowed'
-    #     Raise Value error if no available book exists
-    #     :param book: Book
-    #     :return: BookCopy
-    #     """
-    #     for copy in self._copies:
-    #         if copy.book == book and copy.is_available():
-    #             copy.borrow()
-    #             return copy
-    #     raise ValueError(f"No available copies for book {book} found")
-
     def borrow_copy(self, copy_id: str) -> BookCopy:
         """
         Mark the BookCopy with the given ID as borrowed.

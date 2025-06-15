@@ -30,7 +30,7 @@ class Book:
                 isinstance(other, Book)
                 and self.title == other.title
                 and self.author == other.author
-                and self._year == other._year()
+                and self._year == other._year
         )
 
     def __hash__(self) -> int:
