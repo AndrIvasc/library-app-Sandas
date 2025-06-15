@@ -30,22 +30,23 @@ class Library:
     #             return copy
     #     raise ValueError(f"No available copies for book {book} found")
 
-    def borrow_by_details(self, title: str, author: str) -> BookCopy:
+    def borrow_copy(self, copy_id: str) -> BookCopy:
         """
-        Find an available copy by title and author, and then borrow it.
-        :param title: str
-        :param author: str
+        Mark the BookCopy with the given ID as borrowed.
+        Raises ValueError if no such copy exists,
+        or if it’s already borrowed.
+        :param copy_id: str
         :return: BookCopy
         """
         for copy in self._copies:
-            if (copy.book.title.lower() == title.lower()
-            and copy.book.author.lower() == author.lower()
-            and copy.get_status() == "available"):
-                copy.set_status("borrowed")
+            if copy.copy_id == copy_id:
+                if copy.get_status() != "available":
+                    raise ValueError(f"Copy {copy_id} is not available for borrowing.")
+                copy.borrow()
                 return copy
-            raise Exception(f"No available copy of '{title}' by '{author}'.")
+        raise ValueError(f"No copy of book was found with ID {copy_id}")
 
-    def return_copy(self, copy_id: str):
+    def return_copy(self, copy_id: str) -> BookCopy:
         """
         Marking the BookCopy with the given ID as available.
         Will raise error if copy with given ID is not found
@@ -55,13 +56,14 @@ class Library:
         for copy in self._copies:
             if copy.copy_id == copy_id:
                 copy.return_copy()
-                return
+                return copy
         raise ValueError(f"No copy of book was found with ID {copy_id}")
 
     def find_copies(self, query: str) -> List[BookCopy]:
         """
-        Searching for copies of books whose title or author contains a query string. Its not case-sencitive.
-        Returns a list sorted by publication year descending.
+        Search for copies whose title or author contains the query (case-insensitive),
+        but if multiple copies share the same title and author, only returns the newest one.
+        Results are sorted by publication year, descending.
         :param query: str
         :return: List[BookCopy]
         """
@@ -69,7 +71,16 @@ class Library:
         matches = [c for c in self._copies
                    if q in c.book.title.lower() or q in c.book.author.lower()]
 
-        return sorted(matches, key=lambda c: c.book.get_year(), reverse=True)
+        matches.sort(key=lambda c: c.book.get_year(), reverse=True)
+
+        seen = set()
+        unique = []
+        for copy in matches:
+            key = (copy.book.title.lower(), copy.book.author.lower())
+            if key not in seen:
+                seen.add(key)
+                unique.append(copy)
+        return unique
 
     def list_all_copies(self) -> List[BookCopy]:
         """

@@ -50,3 +50,4 @@ def main():
 
         else:
             print("You have entered a wrong choise. Please enter 1-5 or 0 to exit!")
+            input("\nPress Enter to continue...")
